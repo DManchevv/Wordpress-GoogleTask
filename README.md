@@ -1,1 +1,1 @@
-# Wordpress-GoogleTask
+# Wordpress-GoogleMapsTask
