@@ -8,3 +8,6 @@
     
 </ul>
 
+The result of the program is:
+
+<img src="result.png"/>
