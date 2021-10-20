@@ -11,3 +11,8 @@
 The result of the program is:
 
 <img src="result.png"/>
+
+TODO
+
+Implement XMLHTTPRequest.
+Cleaner Code.
