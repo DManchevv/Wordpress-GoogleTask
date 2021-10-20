@@ -1,0 +1,55 @@
+<!Doctype HTML>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps</title>
+    <style>
+      #map {
+        height:900px;
+        width:100%;
+      }
+      
+      h1 {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>My Google Map</h1>
+    <div id="map"></div>
+    <script>
+      var map;
+      
+      function initMap() {
+        var options = {
+          zoom:2,
+          center:{lat:42.6977,lng:23.3219}
+        }
+        
+        map = new google.maps.Map(document.getElementById('map'), options);
+      }
+      
+      function putMarker(x, y) {
+        var marker = new google.maps.Marker({
+          position:{lat:x, lng:y},
+          map:map
+        });
+      }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNpk6yJf88x353NPMDcoujxS9O4u7GOUo&callback=initMap">
+    </script>
+    <script>
+      window.onload = (event) => {
+      	let a = document.querySelector(".entry-content");
+      	let points = JSON.parse(a.innerText.trim());
+        
+        for (let i = 0; i < points.length; i++) {
+         putMarker(parseFloat(points[i].x), parseFloat(points[i].y)); 
+        }
+        
+        a.style.display = "none";
+      }
+    </script>
+  </body>
+</html>
