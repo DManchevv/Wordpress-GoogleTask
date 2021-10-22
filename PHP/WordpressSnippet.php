@@ -4,6 +4,6 @@
   define('WP_USE_THEMES', false);
   global $wpdb;
   require(ABSPATH . 'wp-load.php');
-  $points = $wpdb->get_results("SELECT x,y FROM google_maps_points");
+  $points = $wpdb->get_results("SELECT * FROM google_maps_points LIMIT 1000");
   echo json_encode($points);
 ?>
