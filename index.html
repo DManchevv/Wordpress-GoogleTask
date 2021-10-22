@@ -1,4 +1,12 @@
-// Code from wordpress editor, I apologize for putting everything in one place
+<!-- Add HTML code to the header or the footer.
+
+For example, you can use the following code for loading the jQuery library from Google CDN:
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+or the following one for loading the Bootstrap library from MaxCDN:
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+-- End of the comment --> 
 
 <!Doctype HTML>
 <html lang="en">
@@ -11,15 +19,12 @@
         height:900px;
         width:100%;
       }
-      
-      h1 {
-        display: none;
-      }
+     
     </style>
   </head>
   <body>
-    <h1>My Google Map</h1>
     <div id="map"></div>
+
     <script>
       var map;
       
@@ -30,12 +35,27 @@
         }
         
         map = new google.maps.Map(document.getElementById('map'), options);
+        
       }
       
       function putMarker(x, y) {
+        let coords = "x=" + x + " ; " + "y=" + y;
+
         var marker = new google.maps.Marker({
           position:{lat:x, lng:y},
           map:map
+        });
+        
+        var infoWindow = new google.maps.InfoWindow({
+        	content:coords
+        });
+        
+        marker.addListener('mouseover', function() {
+          infoWindow.open(map, marker);
+        });
+        
+        marker.addListener('mouseout', function() {
+          infoWindow.close();
         });
       }
     </script>
@@ -47,11 +67,18 @@
       	let points = JSON.parse(a.innerText.trim());
         
         for (let i = 0; i < points.length; i++) {
+          
+          if (points[i].x > 80) {
+            points[i].x -= 2*points[i].x;
+            points[i].x /= 10 + Math.random() * 20;
+          }
+          
          putMarker(parseFloat(points[i].x), parseFloat(points[i].y)); 
         }
         
         a.style.display = "none";
       }
+      
     </script>
   </body>
 </html>
