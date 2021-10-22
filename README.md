@@ -10,7 +10,7 @@
 
 The result of the program is:
 
-<img src="result.png"/>
+<img src="final_result.png"/>
 
 TODO
 
