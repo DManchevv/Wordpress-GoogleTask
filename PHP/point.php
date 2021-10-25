@@ -1,60 +1,60 @@
 <?php
-    class Database {
-        private $connection;
-        private $insertPoint;
-        private $pointWithId;
-        private $getPoints;
 
-        public function __construct() 
-        {
-            $config = parse_ini_file('config.ini', true);
-            $type = $config['db']['type'];
-            $host = $config['db']['host'];
-            $name = $config['db']['name'];
-            $user = $config['db']['user'];
-            $password = $config['db']['password'];
+    require_once 'db.php';
+    header('Content-Type: application/json');
 
-            $this->init($type, $host, $name, $user, $password);
+    class Point {
+        private $x;
+        private $y;
+        private $pointId;
+        private $db;
+
+        public function __construct() {
+            $this->db = new Database();
         }
 
-        private function init($type, $host, $name, $user, $password) 
-        {
-            try {
-                $this->connection = new PDO("$type:host=$host;dbname=$name", $user, $password, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
-                $this->prepareStatements();
+        public function addPoint($id, $x, $y, $elevation, $timezone, $city) {
+            $data = [
+                "id" => $id,
+                "x" => $x,
+                "y" => $y,
+                "elevation" => $elevation,
+                "timezone" => $timezone,
+                "city" => $city
+            ];
 
-                echo "Connection successful\n";
-                
-            } catch (PDOException $e) {
-                echo "Connection failed" . $e->getMessage();
+            $query = $this->db->addPoint($data);
+        }
+
+        public function sendRequest() {
+            $response = file_get_contents("https://api.3geonames.org/?randomland=yes");
+            $xml = new SimpleXMLElement($response);
+
+            $id = $xml->geonumber;
+            $latt = $xml->nearest->latt;
+            $longt = $xml->nearest->longt;
+            $elevation = $xml->nearest->elevation;
+            $timezone = $xml->nearest->timezone;
+            $city = $xml->nearest->city;
+
+            if (is_null($id) || is_null($latt) || is_null($longt) || is_null($elevation) || is_null($timezone) || is_null($city)) {
+                    return;
             }
+
+            $this->addPoint($id, $latt, $longt, $elevation, $timezone, $city);
+
         }
-
-        public function prepareStatements() {
-            $sql = "INSERT INTO google_maps_points (id, x, y, elevation, timezone, city) VALUES (:id, :x, :y, :elevation, :timezone, :city)";
-            $this->insertPoint = $this->connection->prepare($sql);
-
-            $sql = "SELECT * FROM google_maps_points WHERE pointId = :pointId";
-            $this->pointWithId = $this->connection->prepare($sql);
-
-            $sql = "SELECT x, y FROM google_maps_points";
-            $this->getPoints = $this->connection->prepare($sql);
-        }
-
-        public function addPoint($data) {
-            try {
-                $this->insertPoint->execute($data);
-                return ["success" => true];
-            } catch(PDOException $e) {
-                echo "Connection failed" . $e->getMessage(); 
-                return ["success" => false];
-            }
-        }
-
-        function __destruct() 
-        {
-            $this->connection = null;
-        }
+        
     }
 
+    // TESTING
+    $point = new Point();
+    
+    
+    for ($i = 0; $i < 10000; $i++) {
+        $point->sendRequest();
+    }
+
+    
 ?>
+
