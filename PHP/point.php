@@ -13,72 +13,36 @@
             $this->db = new Database();
         }
 
-        public function setX($x) {
-            $this->x = $x;
-        }
-
-        public function setY($y) {
-            $this->y = $y;
-        }
-
-        public function getX() {
-            return $this->x;
-        }
-
-        public function getY() {
-            return $this->y;
-        }
-
-        public function addPoint($pointId, $x, $y) {
+        public function addPoint($id, $x, $y, $elevation, $timezone, $city) {
             $data = [
-                "pointId" => $pointId,
+                "id" => $id,
                 "x" => $x,
                 "y" => $y,
+                "elevation" => $elevation,
+                "timezone" => $timezone,
+                "city" => $city
             ];
 
             $query = $this->db->addPoint($data);
         }
-/*
-        public function findIfPointWithIdExists($pointId) {
-            $foundPoint = $this->db->findPointById($pointId);
-            if ($foundPoint["success"]) {
-                echo "Point with this id is found!\n";
-                return true;
-            }
-            else {
-                echo "Point with this id not found!\n";
-                return false;
-            }
-        }
-*/
-        public function getAllPoints() {
-            $this->db->getAllPoints();
-        }
 
         public function sendRequest() {
-            $response = file_get_contents("https://random-data-api.com/api/number/random_number?size=100&is_xml=true");
-            
+            $response = file_get_contents("https://api.3geonames.org/?randomland=yes");
             $xml = new SimpleXMLElement($response);
-            $counter = 1;
-            $lat = 0;
 
-            foreach($xml->object as $object) {
-                if ($counter % 2 === 1) {
-                    $lat = $object->id;
-                }
-                else {
-                    $this->addPoint("1", $this->adjustNumber($lat, 2), $this->adjustNumber($object->id, 3));
-                }
+            $id = $xml->geonumber;
+            $latt = $xml->nearest->latt;
+            $longt = $xml->nearest->longt;
+            $elevation = $xml->nearest->elevation;
+            $timezone = $xml->nearest->timezone;
+            $city = $xml->nearest->city;
 
-                $counter++;
+            if (is_null($id) || is_null($latt) || is_null($longt) || is_null($elevation) || is_null($timezone) || is_null($city)) {
+                    return;
             }
 
-        }
+            $this->addPoint($id, $latt, $longt, $elevation, $timezone, $city);
 
-        public function adjustNumber($x, $precision) {
-            $dividor = intval(strlen(strval($x))) - $precision;
-            
-            return $x / pow(10, $dividor);
         }
         
     }
@@ -86,9 +50,11 @@
     // TESTING
     $point = new Point();
     
-    for ($i = 1; $i <= 500; $i++) {
+    
+    for ($i = 0; $i < 10000; $i++) {
         $point->sendRequest();
     }
 
     
 ?>
+
