@@ -4,7 +4,7 @@
         private $insertPoint;
         private $pointWithId;
         private $getPoints;
-        
+
         public function __construct() 
         {
             $config = parse_ini_file('config.ini', true);
@@ -31,7 +31,7 @@
         }
 
         public function prepareStatements() {
-            $sql = "INSERT INTO google_maps_points (pointId, x, y) VALUES (:pointId, :x, :y)";
+            $sql = "INSERT INTO google_maps_points (id, x, y, elevation, timezone, city, country) VALUES (:id, :x, :y, :elevation, :timezone, :city, :country)";
             $this->insertPoint = $this->connection->prepare($sql);
 
             $sql = "SELECT * FROM google_maps_points WHERE pointId = :pointId";
@@ -49,23 +49,6 @@
                 echo "Connection failed" . $e->getMessage(); 
                 return ["success" => false];
             }
-        }
-
-        public function findPointById($pointId) {
-            try {
-                $this->pointWithId->execute(["pointId" => $pointId]);
-                return ["success" => true, "point" => $this->pointWithId->fetchAll(PDO::FETCH_ASSOC)];
-            } catch (PDOExcepteion $e) {
-                return ["success" => false];
-            }
-        }
-
-        public function getAllPoints() {
-            $result = $this->connection->query('SELECT x FROM google_maps_points');
-            
-            $info = $result->fetchAll();
-            
-            $jsonTable = json_encode($info);
         }
 
         function __destruct() 
