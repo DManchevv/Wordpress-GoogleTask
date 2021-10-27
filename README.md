@@ -12,7 +12,10 @@ The result of the program is:
 
 <img src="result.png"/>
 
+The UI of the filters menu is:
+
+<img src="filters_UI.png"/>
+
 TODO
 
-Implement XMLHTTPRequest.
-Cleaner Code.
+Better UI.
