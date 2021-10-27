@@ -13,14 +13,15 @@
             $this->db = new Database();
         }
 
-        public function addPoint($id, $x, $y, $elevation, $timezone, $city) {
+        public function addPoint($id, $x, $y, $elevation, $timezone, $city, $country) {
             $data = [
                 "id" => $id,
                 "x" => $x,
                 "y" => $y,
                 "elevation" => $elevation,
                 "timezone" => $timezone,
-                "city" => $city
+                "city" => $city,
+                "country" => $country
             ];
 
             $query = $this->db->addPoint($data);
@@ -36,12 +37,9 @@
             $elevation = $xml->nearest->elevation;
             $timezone = $xml->nearest->timezone;
             $city = $xml->nearest->city;
+            $country = $xml->major->state;
 
-            if (is_null($id) || is_null($latt) || is_null($longt) || is_null($elevation) || is_null($timezone) || is_null($city)) {
-                    return;
-            }
-
-            $this->addPoint($id, $latt, $longt, $elevation, $timezone, $city);
+            $this->addPoint($id, $latt, $longt, $elevation, $timezone, $city, $country);
 
         }
         
