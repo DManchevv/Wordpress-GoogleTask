@@ -14,7 +14,7 @@ The result of the program is:
 
 The UI of the filters menu is:
 
-<img src="filters_UI.png" width="400" height="300"/>
+<img src="filters.png" width="600" height="200"/>
 
 TODO
 
