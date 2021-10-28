@@ -59,6 +59,7 @@
       .lower-menu {
         display: flex;
         justify-content: center;
+        gap: 5rem;
       }
       .timezone-filter, .elevation-filter, .settlement-filter, .country-filter, .point1-filter, .point2-filter {
         display: flex;
@@ -119,8 +120,8 @@
         </div>
       </div>
       <div class="lower-menu">
-        <button id="submitBtn">Submit
-        </button>
+        <button id="submitBtn">Submit</button>
+        <button id="clearBtn" onclick="clearFilters()">Clear</button>
       </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
@@ -159,6 +160,23 @@
           infoWindow.close();
         }
                           );
+        
+        marker.addListener('click', function() {
+          let point1X = document.getElementById("point1X");
+          let point1Y = document.getElementById("point1Y");
+          let point2X = document.getElementById("point2X");
+          let point2Y = document.getElementById("point2Y");
+          
+          if (point1X.value == "" && point1Y.value == "") {
+            point1X.value = marker.getPosition().lat();
+          	point1Y.value = marker.getPosition().lng();
+          } 
+          else if (point2X.value == "" && point2Y.value == "") {
+            point2X.value = marker.getPosition().lat();
+            point2Y.value = marker.getPosition().lng();
+          }
+        });
+        
         markers.push(marker);
       }
       function setMapOnAll(map) {
@@ -204,10 +222,6 @@
             let data = JSON.parse(res);
             let points = data.response;
             for (let i = 0; i < points.length; i++) {
-              if (points[i].x > 80) {
-                points[i].x -= 2*points[i].x;
-                points[i].x /= 10 + Math.random() * 20;
-              }
               putMarker(parseFloat(points[i].x), parseFloat(points[i].y));
             }
           }
@@ -347,7 +361,10 @@
         closeAllLists(e.target);
       }
                                );
-      window.onload = function() {
+      
+      window.onload = clearFilters;
+        
+      function clearFilters() {
         cityTextField.value = "";
         countryTextField.value = "";
         document.getElementById("timezone").value = "";
