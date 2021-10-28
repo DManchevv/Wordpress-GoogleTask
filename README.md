@@ -14,8 +14,8 @@ The result of the program is:
 
 The UI of the filters menu is:
 
-<img src="filters.png" width="800" height="100"/>
+<img src="filters.png" width="1000" height="170"/>
 
 TODO
 
-Better UI.
+Slider filter for elevation.
