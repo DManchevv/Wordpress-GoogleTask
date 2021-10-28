@@ -3,138 +3,363 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Maps</title>
+    <title>Google Maps
+    </title>
     <style>
       #map {
         height:900px;
         width:100%;
       }
-     
+      .autocomplete {
+        width: 300px;
+        position: relative;
+        display: inline-block;
+      }
+      #country[type=text], #city[type=text] {
+        background-color: #f1f1f1;
+        width: 100%;
+      }
+      .autocomplete-items {
+        position: absolute;
+        border: 1px solid #d4d4d4;
+        border-bottom: none;
+        border-top: none;
+        z-index: 99;
+        top: 100%;
+        left: 0;
+        right: 0;
+      }
+      .autocomplete-items div {
+        padding: 10px;
+        cursor: pointer;
+        background-color: #fff;
+        border-bottom: 1px solid #d4d4d4;
+      }
+      .autocomplete-items div:hover {
+        background-color: #e9e9e9;
+      }
+      .autocomplete-active {
+        background-color: DodgerBlue !important;
+        color: #ffffff;
+      }
+      .filters-menu {
+        display: flex;
+        flex-direction: column;
+        margin-top: 2rem;
+        margin-left: 10px;
+        margin-right: 10px;
+        gap: 20px;
+      }
+      .upper-menu {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        background-color: #acc1b4;
+      }
+      .lower-menu {
+        display: flex;
+        justify-content: center;
+      }
+      .timezone-filter, .elevation-filter, .settlement-filter, .country-filter, .point1-filter, .point2-filter {
+        display: flex;
+        flex-direction: column;
+      }
+      .elevation-min, .elevation-max, .point1X, .point1Y, .point2X, .point2Y {
+        width: 150px;
+      }
     </style>
   </head>
   <body>
-    <div id="map"></div>
-	Timezone: <input type="text" id="timezone"/> <br><br>
-    Elevation: <input type="text" id="elevation"/><br><br>
-    City: <input type="text" id="city"/><br><br>
-    Country: <input type="text" id="country"/><br><br>
-    <button id="submitBtn">Submit</button>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <div id="map">
+    </div>
+    <div class="filters-menu">
+      <div class="upper-menu">
+        <div class="timezone-filter">
+          <span>Timezone:
+          </span> 
+          <input type="text" id="timezone"/> 
+        </div>
+        <div class="elevation-filter">
+          <span>Elevation:
+          </span> 
+          Min:  
+          <input type="text" id="elevation-min" class="elevation-min" />
+          Max:    
+          <input type="text" id="elevation-max" class="elevation-max" />
+        </div>
+        <div>
+          <div class="autocomplete settlement-filter">
+            <span>Settlement:
+            </span> 
+            <input type="text" id="city"/>
+          </div>
+        </div>
+        <div>
+          <div class="autocomplete country-filter">
+            <span>Country:
+            </span> 
+            <input type="text" id="country"/>
+          </div>
+        </div>
+        <div class="point1-filter">
+          <span>Point1
+          </span>
+          X:
+          <input type="text" id="point1X" class="point1X"/>
+          Y:
+          <input type="text" id="point1Y" class="point1Y"/>
+        </div>
+        <div class="point2-filter">
+          <span>Point2
+          </span>
+          X:
+          <input type="text" id="point2X" class="point2X"/>
+          Y:
+          <input type="text" id="point2Y" class="point2Y"/>
+        </div>
+      </div>
+      <div class="lower-menu">
+        <button id="submitBtn">Submit
+        </button>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNpk6yJf88x353NPMDcoujxS9O4u7GOUo&callback=initMap">
+    </script>
     <script>
       let map;
       let markers = [];
-
       function initMap() {
         var options = {
           zoom:2,
-          center:{lat:42.6977,lng:23.3219}
+          center:{
+            lat:42.6977,lng:23.3219}
         }
-        
         map = new google.maps.Map(document.getElementById('map'), options);
-        
       }
-      
       function putMarker(x, y) {
         let coords = "x=" + x + " ; " + "y=" + y;
-
         var marker = new google.maps.Marker({
-          position:{lat:x, lng:y},
+          position:{
+            lat:x, lng:y}
+          ,
           map:map
-        });
-        
+        }
+                                           );
         var infoWindow = new google.maps.InfoWindow({
-        	content:coords
-        });
-        
+          content:coords
+        }
+                                                   );
         marker.addListener('mouseover', function() {
           infoWindow.open(map, marker);
-        });
-        
+        }
+                          );
         marker.addListener('mouseout', function() {
           infoWindow.close();
-        });
-        
+        }
+                          );
         markers.push(marker);
       }
-      
       function setMapOnAll(map) {
-      	for (let i = 0; i < markers.length; i++) {
-      		markers[i].setMap(map);
-      	}
-      }
-
-      // Removes the markers from the map, but keeps them in the array.
-      function hideMarkers(){
-      	setMapOnAll(null);
-      }
-
-
-
-      // Deletes all markers in the array by removing references to them.
-      function deleteMarkers(){
-      	hideMarkers();
-      	markers = [];
-      }
-    </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNpk6yJf88x353NPMDcoujxS9O4u7GOUo&callback=initMap"></script>
-    <script>
-     $(document).ready(function () {
-       $("#submitBtn").click(function() {
-         deleteMarkers();
-         let timezone = $("#timezone").val();
-         let elevation = $("#elevation").val();
-         let city = $("#city").val();
-         let country = $("#country").val();
-         
-         $.post("/wp-content/themes/twentytwentyone/getPoints.php",
-            {
-           		timezone: timezone,
-           		elevation: elevation,
-           		city: city,
-           		country: country
-         	},
-            function(res, status) {
-				let data = JSON.parse(res);
-           		
-           		let points = data.response;
-        
-        		for (let i = 0; i < points.length; i++) {
-        			if (points[i].x > 80) {
-          				points[i].x -= 2*points[i].x;
-            			points[i].x /= 10 + Math.random() * 20;
-          			}
-          
-        			putMarker(parseFloat(points[i].x), parseFloat(points[i].y));
-        		}
-         	}
-         );
-       });
-     });
-    </script>
-    <script>
-      /*let url = "/wp-content/themes/twentytwentyone/getPoints.php";
-      let xhr = new XMLHttpRequest();
-      
-      xhr.onreadystatechange = function() {
-      	if (this.readyState == 4 && this.status == 200) {
-        	let points = JSON.parse(xhr.response);
-        
-        	for (let i = 0; i < points.length; i++) {
-        		if (points[i].x > 80) {
-          			points[i].x -= 2*points[i].x;
-            		points[i].x /= 10 + Math.random() * 20;
-          		}
-          
-        		putMarker(parseFloat(points[i].x), parseFloat(points[i].y));
-        	}
+        for (let i = 0; i < markers.length; i++) {
+          markers[i].setMap(map);
         }
-        
-        return;
       }
-   
-      xhr.open("GET", url, true);
-      xhr.send();*/
-      
+      function hideMarkers(){
+        setMapOnAll(null);
+      }
+      function deleteMarkers(){
+        hideMarkers();
+        markers = [];
+      }
+    </script>
+    <script>    
+      $(document).ready(function () {
+        $("#submitBtn").click(function() {
+          deleteMarkers();
+          let timezone = $("#timezone").val();
+          let elevationMin = $("#elevation-min").val();
+          let elevationMax = $("#elevation-max").val();
+          let city = $("#city").val();
+          let country = $("#country").val();
+          let point1X = $("#point1X").val();
+          let point1Y = $("#point1Y").val();
+          let point2X = $("#point2X").val();
+          let point2Y = $("#point2Y").val();
+          $.post("/wp-content/themes/twentytwentyone/getPoints.php",
+                 {
+            timezone: timezone,
+            elevationMin: elevationMin,
+            elevationMax: elevationMax,
+            city: city,
+            country: country,
+            point1X: point1X,
+            point1Y: point1Y,
+            point2X: point2X,
+            point2Y: point2Y
+          }
+                 ,
+                 function(res, status) {
+            let data = JSON.parse(res);
+            let points = data.response;
+            for (let i = 0; i < points.length; i++) {
+              if (points[i].x > 80) {
+                points[i].x -= 2*points[i].x;
+                points[i].x /= 10 + Math.random() * 20;
+              }
+              putMarker(parseFloat(points[i].x), parseFloat(points[i].y));
+            }
+          }
+                );
+        }
+                             );
+      }
+                       );
+      let currentFocus;
+      let countryTextField = document.getElementById("country");
+      let cityTextField = document.getElementById("city");
+      countryTextField.addEventListener('input', () => {
+        generateAutocomplete(countryTextField, "country")}
+                                       );
+      countryTextField.addEventListener('click', () => {
+        generateAutocomplete(countryTextField, "country")}
+                                       );
+      cityTextField.addEventListener('input', () => {
+        generateAutocomplete(cityTextField, "city")}
+                                    );
+      cityTextField.addEventListener('click', () => {
+        generateAutocomplete(cityTextField, "city")}
+                                    );
+      function generateAutocomplete(inputField, type) {
+        let data = {
+        };
+        data["type"] = type;
+        data[type] = inputField.value;
+        if (type == "city") {
+          data["country"] = countryTextField.value;
+        }
+        $.post("/wp-content/themes/twentytwentyone/autocomplete.php", data,
+               function(res, status) {
+          let data = JSON.parse(res);
+          let suggestions = data.response;
+          if (!suggestions) {
+            return;
+          }
+          let a, b, val = inputField.value;
+          closeAllLists();
+          currentFocus = -1;
+          a = document.createElement("DIV");
+          a.setAttribute("id", inputField.id + "autocomplete-list");
+          a.setAttribute("class", "autocomplete-items");
+          inputField.parentNode.appendChild(a);
+          if (!val) {
+            for (let i = 0; i < suggestions.length; i++) {
+              b = document.createElement("DIV");
+              b.innerHTML = "<strong>" + suggestions[i][type] + "</strong>";
+              b.innerHTML += "<input type='hidden' value='" + suggestions[i][type] + "'>";
+              b.addEventListener("click", function(e) {
+                inputField.value = e.target.innerText;
+              }
+                                );
+              a.appendChild(b);
+            }
+          }
+          else {
+            for (let i = 0; i < suggestions.length; i++) {
+              if (suggestions[i][type].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                b = document.createElement("DIV");
+                b.innerHTML = "<strong>" + suggestions[i][type] + "</strong>";
+                b.innerHTML += "<input type='hidden' value='" + suggestions[i][type] + "'>";
+                b.addEventListener("click", function(e) {
+                  inputField.value = e.target.innerText;
+                  if (type == "country") {
+                    cityTextField.value = "";
+                  }
+                }
+                                  );
+                a.appendChild(b);
+              }
+            }
+          }
+        }
+              );
+      }
+      countryTextField.addEventListener("keydown", function(e) {
+        var x = document.getElementById(this.id + "autocomplete-list");
+        if (x) x = x.getElementsByTagName("div");
+        if (e.keyCode == 40) {
+          currentFocus++;
+          addActive(x);
+        }
+        else if (e.keyCode == 38) {
+          currentFocus--;
+          addActive(x);
+        }
+        else if (e.keyCode == 13) {
+          e.preventDefault();
+          if (currentFocus > -1) {
+            if (x) x[currentFocus].click();
+          }
+        }
+      }
+                                       );
+      cityTextField.addEventListener("keydown", function(e) {
+        var x = document.getElementById(this.id + "autocomplete-list");
+        if (x) x = x.getElementsByTagName("div");
+        if (e.keyCode == 40) {
+          currentFocus++;
+          addActive(x);
+        }
+        else if (e.keyCode == 38) {
+          currentFocus--;
+          addActive(x);
+        }
+        else if (e.keyCode == 13) {
+          e.preventDefault();
+          if (currentFocus > -1) {
+            if (x) x[currentFocus].click();
+          }
+        }
+      }
+                                    );
+      function addActive(x) {
+        if (!x) return false;
+        removeActive(x);
+        if (currentFocus >= x.length) currentFocus = 0;
+        if (currentFocus < 0) currentFocus = (x.length - 1);
+        x[currentFocus].classList.add("autocomplete-active");
+      }
+      function removeActive(x) {
+        for (let i = 0; i < x.length; i++) {
+          x[i].classList.remove("autocomplete-active");
+        }
+      }
+      function closeAllLists(textField) {
+        let x = document.getElementsByClassName("autocomplete-items");
+        for (let i = 0; i < x.length; i++) {
+          if (textField != x[i] && textField != countryTextField) {
+            x[i].parentNode.removeChild(x[i]);
+          }
+        }
+      }
+      document.addEventListener("click", function (e) {
+        closeAllLists(e.target);
+      }
+                               );
+      window.onload = function() {
+        cityTextField.value = "";
+        countryTextField.value = "";
+        document.getElementById("timezone").value = "";
+        document.getElementById("elevation-min").value = "";
+        document.getElementById("elevation-max").value = "";
+        document.getElementById("point1X").value = "";
+        document.getElementById("point1Y").value = "";
+        document.getElementById("point2X").value = "";
+        document.getElementById("point2Y").value = "";
+      }
+    </script>
+    <script>
     </script>
   </body>
 </html>
