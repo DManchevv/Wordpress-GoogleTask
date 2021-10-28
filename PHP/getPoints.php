@@ -7,9 +7,15 @@
 	//echo json_encode($points);
 
 	$timezone = $_POST['timezone'];
-	$elevation = $_POST['elevation'];
+	$elevationMin = $_POST['elevationMin'];
+	$elevationMax = $_POST['elevationMax'];
 	$city = $_POST['city'];
 	$country = $_POST['country'];
+	$point1X = $_POST['point1X'];
+	$point1Y = $_POST['point1Y'];
+	$point2X = $_POST['point2X'];
+	$point2Y = $_POST['point2Y'];
+
 	
 	$where = 'WHERE 1';
 
@@ -17,8 +23,12 @@
 		$where .= " and timezone='$timezone'";
 	}
 
-	if (!empty($elevation)) {
-		$where .= " and elevation='$elevation'";
+	if (!empty($elevationMin)) {
+		$where .= " and elevation>'$elevationMin'";
+	}
+
+	if (!empty($elevationMax)) {
+		$where .= " and elevation<'$elevationMax'";
 	}
 
 	if (!empty($city)) {
@@ -27,6 +37,10 @@
 
 	if (!empty($country)) {
 		$where .= " and country='$country'";
+	}
+
+	if (!empty($point1X) && !empty($point1Y) && !empty($point2X) && !empty($point2Y)) {
+		$where .= " and x>'$point1X' and x<'$point2X' and y>'$point1Y' and y<'$point2Y'";
 	}
 
 	$points = $wpdb->get_results("SELECT x,y FROM google_maps_points $where");
